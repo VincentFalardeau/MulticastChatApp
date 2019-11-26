@@ -1,9 +1,0 @@
-﻿  Source.cpp
-C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Serveur\Serveur\Source.cpp(139,5): warning C4267:  'argument': conversion from 'size_t' to 'int', possible loss of data
-     Creating library C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Serveur\x64\Release\Serveur.lib and object C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Serveur\x64\Release\Serveur.exp
-  Generating code
-  2 of 290 functions ( 0.7%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  Serveur.vcxproj -> C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Serveur\x64\Release\Serveur.exe
