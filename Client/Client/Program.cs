@@ -139,146 +139,181 @@ public class Functions
     }
 }
 
-public class ThreadManipulator
-{
-    private Socket serverSocket;
-    private bool endOfCommunication;
-    private bool endOfServerCommunication;
-    private bool fileReceiving;
-    private Thread threadRecv;
-    private bool fileSending;
-    public ThreadManipulator(Socket serverSocket)
-    {
-        this.serverSocket = serverSocket;
-        endOfCommunication = false;
-        endOfServerCommunication = false;
-        fileReceiving = false;
-        fileSending = false;
-    }
+//public class ThreadManipulator
+//{
+//    private Socket serverSocket;
+//    private bool endOfCommunication;
+//    private bool endOfServerCommunication;
+//    //private bool fileReceiving;
+//    private Thread threadRecv;
+//    private bool fileSending;
+//    public ThreadManipulator(Socket serverSocket)
+//    {
+//        this.serverSocket = serverSocket;
+//        endOfCommunication = false;
+//        endOfServerCommunication = false;
+//        //fileReceiving = false;
+//        fileSending = false;
+//    }
 
-    public void StartCommunication()
-    {
-        threadRecv = new Thread(new ThreadStart(this.Receive));
-        Thread threadSend = new Thread(new ThreadStart(this.Send));
-        threadRecv.Start();
-        threadSend.Start();
-    }
+//    public void StartCommunication()
+//    {
+//        threadRecv = new Thread(new ThreadStart(this.Receive));
+//        Thread threadSend = new Thread(new ThreadStart(this.Send));
+//        threadRecv.Start();
+//        threadSend.Start();
+//    }
 
-    public void Receive()
-    {
-        string clientMsg = "";
-        while (!endOfServerCommunication && !endOfCommunication)
-        {
-            try
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine(clientMsg);
+//    public void Receive()
+//    {
+//        string clientMsg = "";
+//        while (!endOfServerCommunication && !endOfCommunication)
+//        {
+//            try
+//            {
+//                Console.ForegroundColor = ConsoleColor.Blue;
+//                Console.WriteLine(clientMsg);
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Functions.ReceiveData(serverSocket, ref clientMsg);
-                endOfServerCommunication = clientMsg == "fin";
-                if (clientMsg.Contains("sfile") && !fileSending)
-                {
-                    fileReceiving = true;
-                    string fileName = clientMsg.Substring(6, clientMsg.Length - 6);
-                    Functions.ReceiveFile(serverSocket, fileName);
-                    clientMsg = "Fichier reçu: " + fileName;
-                    fileReceiving = false;  
+//                Console.ForegroundColor = ConsoleColor.Green;
+//                Functions.ReceiveData(serverSocket, ref clientMsg);
+//                endOfServerCommunication = clientMsg == "fin";
+//                if (clientMsg.Contains("sfile") && !fileSending)
+//                {
+//                    fileReceiving = true;
+//                    string fileName = clientMsg.Substring(6, clientMsg.Length - 6);
+//                    Functions.ReceiveFile(serverSocket, fileName);
+//                    clientMsg = "Fichier reçu: " + fileName;
+//                    fileReceiving = false;  
 
-                }
-            }
-            catch (Exception e)
-            {
-                break;
-            }
+//                }
+//            }
+//            catch (Exception e)
+//            {
+//                break;
+//            }
 
-        }
-        CloseConnection();
-    }
+//        }
+//        CloseConnection();
+//    }
 
-    public void Send()
-    {
-        string msgToClient = "";
-        while (!endOfServerCommunication && !endOfCommunication)
-        {
-            try
-            {
-                msgToClient = "";
-                Console.ForegroundColor = ConsoleColor.Green;
-                msgToClient = Console.ReadLine();
-                //while (FileReceiving) { }
-                endOfCommunication = msgToClient == "fin";
-                if (msgToClient.Contains("sfile"))
-                {
-                    fileSending= true;
-                    string fileName = "";
-                    try
-                    {
-                         fileName = msgToClient.Substring(6, msgToClient.Length - 6);
+//    public void Send()
+//    {
+//        string msgToClient = "";
+//        while (!endOfServerCommunication && !endOfCommunication)
+//        {
+//            try
+//            {
+//                msgToClient = "";
+//                Console.ForegroundColor = ConsoleColor.Green;
+//                msgToClient = Console.ReadLine();
+//                //while (FileReceiving) { }
+//                endOfCommunication = msgToClient == "fin";
+//                if (msgToClient.Contains("sfile"))
+//                {
+//                    fileSending= true;
+//                    string fileName = "";
+//                    try
+//                    {
+//                         fileName = msgToClient.Substring(6, msgToClient.Length - 6);
                        
-                    }
-                    catch (Exception e)
-                    {
-                        fileName = "";
-                    }
-                    threadRecv.Suspend();
-                    Functions.SendFile(serverSocket, fileName);
-                    threadRecv.Resume();
+//                    }
+//                    catch (Exception e)
+//                    {
+//                        fileName = "";
+//                    }
+//                    threadRecv.Suspend();
+//                    Functions.SendFile(serverSocket, fileName);
+//                    threadRecv.Resume();
 
-                    fileSending = false;
+//                    fileSending = false;
 
-                }
-                else if(!fileReceiving)
-                {
-                    serverSocket.Send(Encoding.ASCII.GetBytes(Functions.ChiffrerStringBuilder(new StringBuilder(msgToClient))));
-                }
+//                }
+//                else if(!fileReceiving)
+//                {
+//                    serverSocket.Send(Encoding.ASCII.GetBytes(Functions.ChiffrerStringBuilder(new StringBuilder(msgToClient))));
+//                }
                
-            }
-            catch (Exception e)
-            {
-                break;
-            }
+//            }
+//            catch (Exception e)
+//            {
+//                break;
+//            }
 
-        }
-        CloseConnection();
-    }
+//        }
+//        CloseConnection();
+//    }
 
-    private void CloseConnection()
-    {
-        try
-        {
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            serverSocket.Shutdown(SocketShutdown.Both);
-            serverSocket.Close();
-            Console.WriteLine("Connection éteinte");
-        }
-        catch (Exception e)
-        {
-        }
+//    private void CloseConnection()
+//    {
+//        try
+//        {
+//            Console.ForegroundColor = ConsoleColor.Magenta;
+//            serverSocket.Shutdown(SocketShutdown.Both);
+//            serverSocket.Close();
+//            Console.WriteLine("Connection éteinte");
+//        }
+//        catch (Exception e)
+//        {
+//        }
 
-    }
-}
+//    }
+//}
 
 public class SocketClient
 {
     public static int Main(String[] args)
     {
-        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.ForegroundColor = ConsoleColor.Red;
         string serverIP = "127.0.0.1"; int port = 8080;
         IPEndPoint remoteEP = new IPEndPoint(System.Net.IPAddress.Parse(serverIP), port);
-        Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         try
         {
-            sender.Connect(remoteEP);
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine("Socket connectée à {0}", sender.RemoteEndPoint.ToString());
-            ThreadManipulator monThread = new ThreadManipulator(sender);
-            monThread.StartCommunication();
+            socket.Connect(remoteEP);
+            Console.WriteLine("Socket connectée à {0}", socket.RemoteEndPoint.ToString());
+            //ThreadManipulator monThread = new ThreadManipulator(sender);
+            //monThread.StartCommunication();
+
+            const string OK = "ok";
+            const string END = "fin";
+
+            string message = "";
+            bool endOfCommunication = false;
+            int bytes = Functions.ReceiveData(socket, ref message);
+            if (bytes != 0)
+            {
+                //Attention, dans le substring, si le numéro du client comporte plus de 1 caractère, l'affichage sera erroné
+                Console.WriteLine("Je suis le client #" + message.Substring(0,1) + "\n");
+                //Au cas où le numéro du client et le message de confirmation sont envoyées en même temps
+                if (!message.Contains(OK))
+                {
+                    Functions.ReceiveData(socket, ref message);
+                }
+                else
+                {
+                    message = OK;
+                }
+
+                if(message == OK)
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                    while (!endOfCommunication)
+                    {
+                        message = Console.ReadLine();
+                        endOfCommunication = message == END;
+                        socket.Send(Encoding.ASCII.GetBytes(Functions.ChiffrerStringBuilder(new StringBuilder(message))));
+                    }
+                }
+            }
         }
         catch (ArgumentNullException ane) { Console.WriteLine("ArgumentNullException : {0}", ane.ToString()); }
         catch (SocketException se) { Console.WriteLine("Erreur de communication avec le serveur"); }
         catch (Exception e) { Console.WriteLine("Unexpected exception : {0}", e.ToString()); }
 
+        Console.ForegroundColor = ConsoleColor.Red;
+        socket.Shutdown(SocketShutdown.Both);
+        socket.Close();
+        Console.WriteLine("Connection éteinte");
         return 0;   
     }
 
