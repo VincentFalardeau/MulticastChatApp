@@ -1,0 +1,7 @@
+C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Client\Client\bin\Release\Client.exe.config
+C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Client\Client\bin\Release\Client.exe
+C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Client\Client\bin\Release\Client.pdb
+C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Client\Client\obj\Release\Client.csproj.CoreCompileInputs.cache
+C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Client\Client\obj\Release\Client.exe
+C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Client\Client\obj\Release\Client.pdb
+C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Client\Client\obj\Release\Client.csprojAssemblyReference.cache

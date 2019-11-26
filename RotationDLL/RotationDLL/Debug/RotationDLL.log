@@ -1,0 +1,5 @@
+﻿  rotation.cpp
+C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\RotationDLL\RotationDLL\rotation.cpp(15,20): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\RotationDLL\RotationDLL\rotation.cpp(66,20): warning C4018:  '<': signed/unsigned mismatch
+     Creating library C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Client\Debug\RotationDLL.lib and object C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Client\Debug\RotationDLL.exp
+  RotationDLL.vcxproj -> C:\Users\Vincent\Documents\__Session5\Client_Serveur\TP3\TP3\TP3_FalardeauVincent\Client\Debug\RotationDLL.dll
