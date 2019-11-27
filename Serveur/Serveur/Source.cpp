@@ -18,6 +18,8 @@ using namespace std;
 const int MAX_CLIENTS = 5;
 const string END = "fin";
 
+HANDLE hSemaphore;
+
 struct Client
 {
 	int id;
@@ -25,7 +27,7 @@ struct Client
 };
 
 int GetAvailableId();
-void ShutDownClient(SOCKET* pClientSocket, string msgToClient, string msgToServer);
+void ShutDownClient(SOCKET* pClientSocket, int id, string msgToClient, string msgToServer);
 int SendMsgToClient(SOCKET* pClientSocket, const char* msgToClient);
 int ReceiveClientMessage(SOCKET* pClientSocket, string& clientMsg);
 DWORD WINAPI ClientThread(void* pParam);
@@ -82,7 +84,7 @@ int main()
 
 	int numClient = 0;
 	bool endOfCommunication = false;
-	HANDLE clientThreads[MAX_CLIENTS];
+	HANDLE hClientThreads[MAX_CLIENTS];
 
 	Client client;
 	//Initialiser le vecteur clients
@@ -92,6 +94,7 @@ int main()
 		client.socket = INVALID_SOCKET;
 		clients[i] = client;
 	}
+	hSemaphore = CreateSemaphore(NULL, 2 /* valeur de depart */, 2 /* nb max d'access */, NULL);
 	while (!endOfCommunication)
 	{
 		SOCKET newSocket = INVALID_SOCKET;
@@ -101,44 +104,37 @@ int main()
 			numClient = GetAvailableId();
 			if (numClient != -1) 
 			{
+				ColorConsole(6, 0);
 				clients[numClient].socket = newSocket;
 				cout << "Le client #" << numClient << " est accepté" << endl;
 				iResult = SendMsgToClient(&newSocket, (char*)to_string(numClient).c_str());
 				if (iResult == 0)
 				{
-					string ok = "ok";
-					iResult = SendMsgToClient(&newSocket, (char*)ok.c_str());
-					if (iResult == 0)
-					{
-						clientThreads[numClient] = CreateThread(NULL, 0, ClientThread, &clients[numClient], 0, 0);
-					}
-					else
-					{
-						ShutDownClient(&newSocket, "", (string)("Client #" + to_string(client.id) + " déconnecté"));
-					}
+
+					hClientThreads[numClient] = CreateThread(NULL, 0, ClientThread, &clients[numClient], 0, 0);
 				}
 				else 
 				{
-					ShutDownClient(&newSocket, "", (string)("Client #" + to_string(client.id) + " déconnecté"));
+					ShutDownClient(&newSocket, numClient, "", (string)("Client #" + to_string(client.id) + " déconnecté"));
 				}
 			}
 			else
 			{
-				ShutDownClient(&newSocket, "Le serveur est plein", "");
+				ShutDownClient(&newSocket, numClient, "Le serveur est plein", "");
 			}
 		}
 	} 
 	closesocket(listenSocket);
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
-		CloseHandle(clientThreads[i]);
+		CloseHandle(hClientThreads[i]);
 		closesocket(clients[i].socket);
 	}
 	WSACleanup();
 	return 0;
 }
 
-void ShutDownClient(SOCKET* pClientSocket, string msgToClient, string msgToServer)
+void ShutDownClient(SOCKET* pClientSocket, int id, string msgToClient, string msgToServer)
 {
 	ColorConsole(6, 0);
 	if (msgToClient != "")
@@ -150,6 +146,8 @@ void ShutDownClient(SOCKET* pClientSocket, string msgToClient, string msgToServe
 		cout << msgToServer << endl;
 	}
 	closesocket(*pClientSocket);
+	closesocket(clients[id].socket);
+	clients[id].socket = INVALID_SOCKET;
 }
 
 int GetAvailableId() 
@@ -170,8 +168,25 @@ DWORD WINAPI ClientThread(void* pParam)
 {
 	Client* client = reinterpret_cast<Client*>(pParam);
 	string msg;
+	int iResult = ReceiveClientMessage(&client->socket, msg);
+	if (msg == "ok")
+	{
+		ColorConsole(client->id + 1, 0);
+		cout << msg << endl;
+	}
+	else
+	{
+		ShutDownClient(&client->socket, client->id, "", (string)("Client #" + to_string(client->id) + " déconnecté"));
+	}
+	WaitForSingleObject(hSemaphore, INFINITE);
+	iResult = SendMsgToClient(&client->socket, (char*)((string)"ok").c_str());
+	if (iResult != 0)
+	{
+		ShutDownClient(&client->socket, client->id, "", (string)("Client #" + to_string(client->id) + " déconnecté"));
+		return 0;
+	}
+	
 	bool endOfCommunication = false;
-	int iResult = 0;
 	while (!endOfCommunication)
 	{
 		if(client->socket != 0)
@@ -184,13 +199,12 @@ DWORD WINAPI ClientThread(void* pParam)
 			}
 			else
 			{
-				ShutDownClient(&client->socket, "", (string)("Client #" + to_string(client->id) + " déconnecté"));
-				closesocket(clients[client->id].socket);
-				clients[client->id].socket = INVALID_SOCKET;
+				ShutDownClient(&client->socket, client->id, "", (string)("Client #" + to_string(client->id) + " déconnecté"));
 				endOfCommunication = true;
 			}
 		}
 	}
+	ReleaseSemaphore(hSemaphore, 1, NULL); 
 	return 0;
 }
 

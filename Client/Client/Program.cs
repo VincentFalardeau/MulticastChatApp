@@ -274,7 +274,6 @@ public class SocketClient
             //ThreadManipulator monThread = new ThreadManipulator(sender);
             //monThread.StartCommunication();
 
-            const string OK = "ok";
             const string END = "fin";
 
             string message = "";
@@ -282,21 +281,12 @@ public class SocketClient
             int bytes = Functions.ReceiveData(socket, ref message);
             if (bytes != 0)
             {
-                //Attention, dans le substring, si le numéro du client comporte plus de 1 caractère, l'affichage sera erroné
-                Console.WriteLine("Je suis le client #" + message.Substring(0,1) + "\n");
-                //Au cas où le numéro du client et le message de confirmation sont envoyées en même temps
-                if (!message.Contains(OK))
+                Console.WriteLine("Je suis le client #" + message + "\n");
+                Console.ForegroundColor = ConsoleColor.White;
+                socket.Send(Encoding.ASCII.GetBytes(Functions.ChiffrerStringBuilder(new StringBuilder("ok"))));
+                bytes = Functions.ReceiveData(socket, ref message);
+                if(message == "ok")
                 {
-                    Functions.ReceiveData(socket, ref message);
-                }
-                else
-                {
-                    message = OK;
-                }
-
-                if(message == OK)
-                {
-                    Console.ForegroundColor = ConsoleColor.White;
                     while (!endOfCommunication)
                     {
                         message = Console.ReadLine();
@@ -304,6 +294,7 @@ public class SocketClient
                         socket.Send(Encoding.ASCII.GetBytes(Functions.ChiffrerStringBuilder(new StringBuilder(message))));
                     }
                 }
+               
             }
         }
         catch (ArgumentNullException ane) { Console.WriteLine("ArgumentNullException : {0}", ane.ToString()); }
