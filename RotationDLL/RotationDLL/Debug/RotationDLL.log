@@ -1,5 +1,5 @@
 ﻿  rotation.cpp
-C:\Users\Vincent\Documents\session5\Current_Projects\Tp_Final_Client_Serveur_2019\RotationDLL\RotationDLL\rotation.cpp(15,20): warning C4018:  '<': signed/unsigned mismatch
-C:\Users\Vincent\Documents\session5\Current_Projects\Tp_Final_Client_Serveur_2019\RotationDLL\RotationDLL\rotation.cpp(66,20): warning C4018:  '<': signed/unsigned mismatch
-     Creating library C:\Users\Vincent\Documents\session5\Current_Projects\Tp_Final_Client_Serveur_2019\Client\Debug\RotationDLL.lib and object C:\Users\Vincent\Documents\session5\Current_Projects\Tp_Final_Client_Serveur_2019\Client\Debug\RotationDLL.exp
-  RotationDLL.vcxproj -> C:\Users\Vincent\Documents\session5\Current_Projects\Tp_Final_Client_Serveur_2019\Client\Debug\RotationDLL.dll
+d:\Users\201736057\Documents\Tp_Final_Client_Serveur_2019\RotationDLL\RotationDLL\rotation.cpp(15,20): warning C4018:  '<' : incompatibilité signed/unsigned
+d:\Users\201736057\Documents\Tp_Final_Client_Serveur_2019\RotationDLL\RotationDLL\rotation.cpp(66,20): warning C4018:  '<' : incompatibilité signed/unsigned
+     Création de la bibliothèque d:\Users\201736057\Documents\Tp_Final_Client_Serveur_2019\Client\Debug\RotationDLL.lib et de l'objet d:\Users\201736057\Documents\Tp_Final_Client_Serveur_2019\Client\Debug\RotationDLL.exp
+  RotationDLL.vcxproj -> d:\Users\201736057\Documents\Tp_Final_Client_Serveur_2019\Client\Debug\RotationDLL.dll

@@ -17,6 +17,7 @@ using namespace std;
 
 const int MAX_CLIENTS = 5;
 const string END = "fin";
+const string FILE_RECV_CMB = "sfile";
 
 HANDLE hSemaphore;
 
@@ -30,6 +31,8 @@ int GetAvailableId();
 void ShutDownClient(SOCKET* pClientSocket, int id, string msgToClient, string msgToServer);
 int SendMsgToClient(SOCKET* pClientSocket, const char* msgToClient);
 int ReceiveClientMessage(SOCKET* pClientSocket, string& clientMsg);
+void Write(ofstream*, string);
+int ReceiveFile(Client*, string);
 DWORD WINAPI ClientThread(void* pParam);
 void ColorConsole(int couleurDuTexte, int couleurDeFond);
 
@@ -45,7 +48,7 @@ int main()
 
 	sin.sin_addr.s_addr = inet_addr("127.0.0.1");
 	sin.sin_family = AF_INET;
-	sin.sin_port = htons(8080);
+	sin.sin_port = htons(80);
 
 	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
@@ -146,8 +149,12 @@ void ShutDownClient(SOCKET* pClientSocket, int id, string msgToClient, string ms
 		cout << msgToServer << endl;
 	}
 	closesocket(*pClientSocket);
-	closesocket(clients[id].socket);
-	clients[id].socket = INVALID_SOCKET;
+	if (id != -1) 
+	{
+		closesocket(clients[id].socket);
+		clients[id].socket = INVALID_SOCKET;
+	}
+	
 }
 
 int GetAvailableId() 
@@ -169,14 +176,10 @@ DWORD WINAPI ClientThread(void* pParam)
 	Client* client = reinterpret_cast<Client*>(pParam);
 	string msg;
 	int iResult = ReceiveClientMessage(&client->socket, msg);
-	if (msg == "ok")
-	{
-		ColorConsole(client->id + 1, 0);
-		cout << msg << endl;
-	}
-	else
+	if (msg != "ok")
 	{
 		ShutDownClient(&client->socket, client->id, "", (string)("Client #" + to_string(client->id) + " déconnecté"));
+		return 0;
 	}
 	WaitForSingleObject(hSemaphore, INFINITE);
 	iResult = SendMsgToClient(&client->socket, (char*)((string)"ok").c_str());
@@ -192,10 +195,17 @@ DWORD WINAPI ClientThread(void* pParam)
 		if(client->socket != 0)
 		{
 			iResult = ReceiveClientMessage(&client->socket, msg);
-			if (iResult > 0 && msg != END)
+			if (iResult > 0 && msg != END && msg.find(FILE_RECV_CMB) == string::npos)
 			{
 				ColorConsole(client->id + 1, 0);
-				cout << msg << endl;
+				cout << "Client #" << client->id << ": " << msg << endl;
+			}
+			else if (iResult > 0 && msg != END && msg.find(FILE_RECV_CMB) != string::npos) {
+				string fileName = msg.substr(6, msg.find("\n") - 6);
+				
+				ReceiveFile(client, fileName);
+				ColorConsole(client->id + 1, 0);
+				cout << "Client #" << client->id << ": " << "Fichier reçu: " << fileName << endl;
 			}
 			else
 			{
@@ -206,6 +216,51 @@ DWORD WINAPI ClientThread(void* pParam)
 	}
 	ReleaseSemaphore(hSemaphore, 1, NULL); 
 	return 0;
+}
+
+//Sert à recevoir un fichier
+int ReceiveFile(Client* client, string fileName)
+{
+	try
+	{
+		SOCKET* pClientSocket = &client->socket;
+		ofstream ofs("Client" + to_string(client->id) + "-" + fileName);
+		string clientMsg = "";
+		string pr = "pr";
+		//Confirmer la reception de fichier au client
+		if (SendMsgToClient(pClientSocket, (char*)pr.c_str()) != 0) return 1;
+		//Tant que la réception n'est pas terminée
+		while (clientMsg != "efile")
+		{
+			//Écriture du paquet reçu au fichier
+			Write(&ofs, clientMsg);
+			//Réception du paquet
+			ReceiveClientMessage(pClientSocket, clientMsg);
+			pr = "pr";
+			//Confirmation de la réception
+			if (clientMsg != "efile")
+			{
+				if (SendMsgToClient(pClientSocket, (char*)pr.c_str()) != 0) return 1;
+			}
+			
+		}
+		ofs.close();
+	}
+	catch (exception)
+	{
+		cout << "Erreur de réception de fichier" << endl;
+	}
+	return 0;
+}
+
+//Sert à écrire à un osftream
+void Write(ofstream* ofs, string str)
+{
+	//Nettoyage du string
+	replace(str.begin(), str.end(), '\n', ' ');
+	str.erase(remove(str.begin(), str.end(), 'Ì'), str.end());
+	//Écriture à l'ofs
+	*ofs << str;
 }
 
 int SendMsgToClient(SOCKET* pClientSocket, const char* msgToClient)
@@ -476,7 +531,11 @@ void ColorConsole(int couleurDuTexte, int couleurDeFond)
 //			//On reçoit la confirmation du client
 //			while (clientMsg != "pr") 
 //			{
-//				ReceiveClientMessage(pClientSocket, clientMsg);
+//				
+
+
+
+
 //			}
 //			clientMsg = "";
 //			while (!ifs.eof())

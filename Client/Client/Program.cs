@@ -75,10 +75,7 @@ public class Functions
             int bytesSent = sender.Send(Encoding.ASCII.GetBytes(ChiffrerStringBuilder(new StringBuilder("sfile " + fileName))));
             string clientMsg = "";
             int byteRecv = 0;
-            //while(clientMsg != "pr")
-            //{
-                
-            //}
+
             byteRecv = ReceiveData(sender, ref clientMsg);
             clientMsg = "";
             //On envoi un à un les paquets au sender
@@ -96,7 +93,9 @@ public class Functions
         }
         catch (IOException)
         {
-            Console.WriteLine($"ERREUR, impossible de trouver ou de lire le fichier");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"erreur, impossible de trouver ou de lire le fichier");
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 
@@ -264,7 +263,7 @@ public class SocketClient
     public static int Main(String[] args)
     {
         Console.ForegroundColor = ConsoleColor.Red;
-        string serverIP = "127.0.0.1"; int port = 8080;
+        string serverIP = "127.0.0.1"; int port = 80;
         IPEndPoint remoteEP = new IPEndPoint(System.Net.IPAddress.Parse(serverIP), port);
         Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         try
@@ -291,7 +290,25 @@ public class SocketClient
                     {
                         message = Console.ReadLine();
                         endOfCommunication = message == END;
-                        socket.Send(Encoding.ASCII.GetBytes(Functions.ChiffrerStringBuilder(new StringBuilder(message))));
+                        if (message.Contains("sfile"))
+                        {
+                            string fileName = "";
+                            try
+                            {
+                                fileName = message.Substring(6, message.Length - 6);
+
+                            }
+                            catch (Exception e)
+                            {
+                                fileName = "";
+                            }
+                            Functions.SendFile(socket, fileName);
+                        }
+                        else
+                        {
+                            socket.Send(Encoding.ASCII.GetBytes(Functions.ChiffrerStringBuilder(new StringBuilder(message))));
+                        }
+                        
                     }
                 }
                
