@@ -99,164 +99,11 @@ public class Functions
         }
     }
 
-    //Sert à recevoir un fichier de la part du sender
-    public static void ReceiveFile(Socket sender, string fileName)
-    {
-        try
-        {
-            //On ouvre un ofs au nom du fichier reçu
-            StreamWriter ofs = new StreamWriter(fileName);
-            int bytesSent = sender.Send(Encoding.ASCII.GetBytes(ChiffrerStringBuilder(new StringBuilder("pr"))));
-            bytesSent = sender.Send(Encoding.ASCII.GetBytes(ChiffrerStringBuilder(new StringBuilder("pr"))));
-            string clientMsg = "";
-            int bytesRec = 0;
-            //Tant que la réception du fichier n'est pas terminée
-            while (clientMsg != "efile")
-            {
-
-                //Écriture au ofs
-                ofs.Write(clientMsg);
-
-                //Réception du prochain paquet
-                bytesRec = ReceiveData(sender, ref clientMsg);
-                
-                if(clientMsg != "efile")
-                {
-                    //Envoi de la confirmation au sender
-                    bytesSent = sender.Send(Encoding.ASCII.GetBytes(ChiffrerStringBuilder(new StringBuilder("pr"))));
-                }
-         
-            }
-            ofs.Close();
-            Console.ForegroundColor = ConsoleColor.Blue;
-
-        }
-        catch (Exception)
-        {
-            Console.WriteLine("Erreur de réception du fichier");
-        }
-    }
+   
+    
 }
 
-//public class ThreadManipulator
-//{
-//    private Socket serverSocket;
-//    private bool endOfCommunication;
-//    private bool endOfServerCommunication;
-//    //private bool fileReceiving;
-//    private Thread threadRecv;
-//    private bool fileSending;
-//    public ThreadManipulator(Socket serverSocket)
-//    {
-//        this.serverSocket = serverSocket;
-//        endOfCommunication = false;
-//        endOfServerCommunication = false;
-//        //fileReceiving = false;
-//        fileSending = false;
-//    }
 
-//    public void StartCommunication()
-//    {
-//        threadRecv = new Thread(new ThreadStart(this.Receive));
-//        Thread threadSend = new Thread(new ThreadStart(this.Send));
-//        threadRecv.Start();
-//        threadSend.Start();
-//    }
-
-//    public void Receive()
-//    {
-//        string clientMsg = "";
-//        while (!endOfServerCommunication && !endOfCommunication)
-//        {
-//            try
-//            {
-//                Console.ForegroundColor = ConsoleColor.Blue;
-//                Console.WriteLine(clientMsg);
-
-//                Console.ForegroundColor = ConsoleColor.Green;
-//                Functions.ReceiveData(serverSocket, ref clientMsg);
-//                endOfServerCommunication = clientMsg == "fin";
-//                if (clientMsg.Contains("sfile") && !fileSending)
-//                {
-//                    fileReceiving = true;
-//                    string fileName = clientMsg.Substring(6, clientMsg.Length - 6);
-//                    Functions.ReceiveFile(serverSocket, fileName);
-//                    clientMsg = "Fichier reçu: " + fileName;
-//                    fileReceiving = false;  
-
-//                }
-//            }
-//            catch (Exception e)
-//            {
-//                break;
-//            }
-
-//        }
-//        CloseConnection();
-//    }
-
-//    public void Send()
-//    {
-//        string msgToClient = "";
-//        while (!endOfServerCommunication && !endOfCommunication)
-//        {
-//            try
-//            {
-//                msgToClient = "";
-//                Console.ForegroundColor = ConsoleColor.Green;
-//                msgToClient = Console.ReadLine();
-//                //while (FileReceiving) { }
-//                endOfCommunication = msgToClient == "fin";
-//                if (msgToClient.Contains("sfile"))
-//                {
-//                    fileSending= true;
-//                    string fileName = "";
-//                    try
-//                    {
-//                         fileName = msgToClient.Substring(6, msgToClient.Length - 6);
-                       
-//                    }
-//                    catch (Exception e)
-//                    {
-//                        fileName = "";
-//                    }
-//                    threadRecv.Suspend();
-//                    Functions.SendFile(serverSocket, fileName);
-//                    threadRecv.Resume();
-
-//                    fileSending = false;
-
-//                }
-//                else if(!fileReceiving)
-//                {
-//                    serverSocket.Send(Encoding.ASCII.GetBytes(Functions.ChiffrerStringBuilder(new StringBuilder(msgToClient))));
-//                }
-               
-//            }
-//            catch (Exception e)
-//            {
-//                break;
-//            }
-
-//        }
-//        CloseConnection();
-//    }
-
-//    private void CloseConnection()
-//    {
-//        try
-//        {
-//            Console.ForegroundColor = ConsoleColor.Magenta;
-//            serverSocket.Shutdown(SocketShutdown.Both);
-//            serverSocket.Close();
-//            Console.WriteLine("Connection éteinte");
-//        }
-//        catch (Exception e)
-//        {
-//        }
-
-//    }
-//}
 
 public class SocketClient
 {
@@ -270,26 +117,26 @@ public class SocketClient
         {
             socket.Connect(remoteEP);
             Console.WriteLine("Socket connectée à {0}", socket.RemoteEndPoint.ToString());
-            //ThreadManipulator monThread = new ThreadManipulator(sender);
-            //monThread.StartCommunication();
-
-            const string END = "fin";
 
             string message = "";
             bool endOfCommunication = false;
+            //Recevoir la confirmation de connexion 
             int bytes = Functions.ReceiveData(socket, ref message);
             if (bytes != 0)
             {
+                
                 Console.WriteLine("Je suis le client #" + message + "\n");
                 Console.ForegroundColor = ConsoleColor.White;
                 socket.Send(Encoding.ASCII.GetBytes(Functions.ChiffrerStringBuilder(new StringBuilder("ok"))));
+                //Recevoir la confirmation qu'on a le droit d'écrire
                 bytes = Functions.ReceiveData(socket, ref message);
                 if(message == "ok")
                 {
                     while (!endOfCommunication)
                     {
+                        //Envoi de messages, tant qu'on est en communication
                         message = Console.ReadLine();
-                        endOfCommunication = message == END;
+                        endOfCommunication = message == "fin";
                         if (message.Contains("sfile"))
                         {
                             string fileName = "";
