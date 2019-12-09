@@ -1,0 +1,6 @@
+C:\Users\Vincent\Documents\Cegep\session5\Client_Serveur\Tp_Final_Client_Serveur_2019\Client\Client\bin\Release\Client.exe.config
+C:\Users\Vincent\Documents\Cegep\session5\Client_Serveur\Tp_Final_Client_Serveur_2019\Client\Client\bin\Release\Client.exe
+C:\Users\Vincent\Documents\Cegep\session5\Client_Serveur\Tp_Final_Client_Serveur_2019\Client\Client\bin\Release\Client.pdb
+C:\Users\Vincent\Documents\Cegep\session5\Client_Serveur\Tp_Final_Client_Serveur_2019\Client\Client\obj\Release\Client.csproj.CoreCompileInputs.cache
+C:\Users\Vincent\Documents\Cegep\session5\Client_Serveur\Tp_Final_Client_Serveur_2019\Client\Client\obj\Release\Client.exe
+C:\Users\Vincent\Documents\Cegep\session5\Client_Serveur\Tp_Final_Client_Serveur_2019\Client\Client\obj\Release\Client.pdb

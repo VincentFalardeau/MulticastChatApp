@@ -16,8 +16,6 @@ using namespace std;
 #pragma comment(lib, "Ws2_32.lib")
 
 const int MAX_CLIENTS = 5;
-const string END = "fin";
-const string FILE_RECV_CMB = "sfile";
 
 HANDLE hSemaphore;
 
@@ -195,12 +193,12 @@ DWORD WINAPI ClientThread(void* pParam)
 		if(client->socket != 0)
 		{
 			iResult = ReceiveClientMessage(&client->socket, msg);
-			if (iResult > 0 && msg != END && msg.find(FILE_RECV_CMB) == string::npos)
+			if (iResult > 0 && msg != "fin" && msg.find("sfile") == string::npos)
 			{
 				ColorConsole(client->id + 1, 0);
 				cout << "Client #" << client->id << ": " << msg << endl;
 			}
-			else if (iResult > 0 && msg != END && msg.find(FILE_RECV_CMB) != string::npos) {
+			else if (iResult > 0 && msg != "fin" && msg.find("sfile") != string::npos) {
 				string fileName = msg.substr(6, msg.find("\n") - 6);
 				
 				ReceiveFile(client, fileName);
@@ -257,7 +255,7 @@ int ReceiveFile(Client* client, string fileName)
 void Write(ofstream* ofs, string str)
 {
 	//Nettoyage du string
-	replace(str.begin(), str.end(), '\n', ' ');
+	str.erase(remove(str.begin(), str.end(), '\r'), str.end());
 	str.erase(remove(str.begin(), str.end(), 'Ì'), str.end());
 	//Écriture à l'ofs
 	*ofs << str;
